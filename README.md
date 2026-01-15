@@ -1,2 +1,1 @@
-# met-converter
-Metabolic equivalent of task converter
+## Metabolic equivalent of task converter
