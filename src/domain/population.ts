@@ -1,1 +1,0 @@
-export type population = "adult" | "olderAdult" | "wheelchair" | "child";

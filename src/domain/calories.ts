@@ -1,5 +1,3 @@
-import type { population } from "./population";
-
 export type calories = {
     met: number;
     weightKg: number;
@@ -7,6 +5,6 @@ export type calories = {
     durationHours?: number;
     age: number;
     sex?: "male" | "female";
-    population: population;
+    wheelchair: boolean;
 }
 

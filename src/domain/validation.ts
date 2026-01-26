@@ -5,7 +5,7 @@ export const ActivitySchema = z.object({
     name: z.string(),
     met: z.number().positive(),
     category: z.string(),
-    intensity: z.enum(["low", "moderate", "vigorous"]),
+    intensity: z.enum(["low", "moderate", "vigorous", "unknown", "general"]),
     aliases: z.array(z.string()),
     keywords: z.array(z.string()),
 });

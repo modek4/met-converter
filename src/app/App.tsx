@@ -3,6 +3,7 @@ import { Search } from "../components/Search";
 import { Details } from "../components/Details";
 import { Calculator } from "../components/Calculator";
 import { PreparedActivity } from "../domain/activity";
+import {language} from "../logic/loader";
 
 const App = () => {
   const [selected, setSelected] = useState<PreparedActivity | null>(null);
@@ -34,7 +35,11 @@ const App = () => {
       <div className="flex items-center justify-between mb-2">
         <div>
           <span className="text-gray-700 block">Search for an activity:</span>
-          <sub className="text-gray-500 mb-4 block">Supported languages: English and Polish</sub>
+          <sub className="text-gray-500 mb-4 block">Loaded:
+            {language.en && " English"}
+            {language.pl && " Polish"}
+            {!language.en && !language.pl && " None"}
+          </sub>
         </div>
 
         <select className="mb-4" value={limit} onChange={(e) => setLimit(Number(e.target.value))}>

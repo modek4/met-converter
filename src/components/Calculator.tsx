@@ -10,13 +10,14 @@ export const Calculator: FC<CalculatorProps> = ({ activity }) => {
   const [weight, setWeight] = useState(70);
   const [duration, setDuration] = useState(30);
   const [age, setAge] = useState(30);
+  const [wheelchair, setWheelchair] = useState(false);
 
   const calories = calculateCalories({
     met: activity.met,
     weightKg: weight,
     durationMin: duration,
     age,
-    population: "adult",
+    wheelchair: wheelchair
   });
 
   return (
@@ -29,6 +30,8 @@ export const Calculator: FC<CalculatorProps> = ({ activity }) => {
           <input
             type="number"
             value={age}
+            min={6}
+            max={120}
             onChange={(e) => setAge(Number(e.target.value))}
             className="px-2 py-1 border border-gray-300 rounded-md w-24"
           />
@@ -51,6 +54,16 @@ export const Calculator: FC<CalculatorProps> = ({ activity }) => {
             value={duration}
             onChange={(e) => setDuration(Number(e.target.value))}
             className="px-2 py-1 border border-gray-300 rounded-md w-24"
+          />
+        </label>
+
+        <label className="flex items-center gap-2">
+          <span>Wheelchair User:</span>
+          <input
+            type="checkbox"
+            checked={wheelchair}
+            onChange={(e) => setWheelchair(e.target.checked)}
+            className="w-5 h-5 rounded-md"
           />
         </label>
 

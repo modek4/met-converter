@@ -1,32 +1,24 @@
 import type { calories } from "../domain/calories";
-import type { population } from "../domain/population";
 
 export const calculateCalories = (params: calories): number => {
-    const { met, weightKg, durationMin, population } = params;
-    switch (population as population) {
-        case "adult":
-            //* 19-59
-            return (met * 3.5 * weightKg * durationMin) / 200;
+    const { met, weightKg, durationMin, age, wheelchair } = params;
+    const baseFormula = (vo2: number) => (met * vo2 * weightKg * durationMin) / 200;
 
-        case "olderAdult":
-            //* 60+ 2.7 ml/kg/min
-            return (met * 3.5 * weightKg * durationMin) / 200;
-
-        case "wheelchair":
-            //* Wheelchair 0.992 kcal/kg/h
-            return (met * 3.5 * weightKg * durationMin) / 200;
-
-        case "child":
-            //TODO Find proper formula for children
-            // 6-9 years
-            // 10-12 years
-            // 13-15 years
-            // 16-18 years
-            //https://pmc.ncbi.nlm.nih.gov/articles/PMC5768467/
-            //https://www.nccor.org/tools-youthcompendium/met-view-all-categories/
-            return (met * 3.5 * weightKg * durationMin) / 200;
-
-        default:
-            throw new Error("Invalid population type");
+    const childFactor = (age: number): number => {
+        if (age >= 6 && age <= 9) return 4.0;
+        if (age >= 10 && age <= 12) return 4.5;
+        if (age >= 13 && age <= 15) return 5.0;
+        if (age >= 16 && age <= 18) return 5.5;
+        return 3.5;
     }
+
+    if (age === null || age === undefined || isNaN(age) || age < 6 || age > 120 || !Number.isInteger(age)) return 0;
+    if (weightKg <= 0 || isNaN(weightKg) || weightKg === null || weightKg === undefined || weightKg > 500) return 0;
+    if (durationMin <= 0 || isNaN(durationMin) || durationMin === null || durationMin === undefined || durationMin > 1440) return 0;
+
+    let multipalier = 3.5;
+    if (age >= 60) multipalier = 2.7;
+    if (age < 18) multipalier = childFactor(age);
+    if (wheelchair) multipalier *= 0.992;
+    return baseFormula(multipalier);
 };

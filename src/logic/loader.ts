@@ -1,19 +1,36 @@
-import RAW_PL from "../data/pl.json";
-import RAW_EN from "../data/en.json";
 import { PreparedActivity } from "../domain/activity";
 import { Activity, ActivityArraySchema } from "../domain/validation";
 import { buildRoots } from "./roots";
 import { initStemmer, stemmingTokens } from "./stemmer";
 import { tokenize } from "./tokenize";
 
-const parsedPL = ActivityArraySchema.safeParse(RAW_PL);
-if (!parsedPL.success) throw new Error("Invalid PL activity data: " + parsedPL.error.message);
-const parsedEN = ActivityArraySchema.safeParse(RAW_EN);
-if (!parsedEN.success) throw new Error("Invalid EN activity data: " + parsedEN.error.message);
+export const language = {
+    en: true,
+    pl: true,
+}
 
-const betterRawPL = parsedPL.data.map(a => ({ ...a, id: `pl_${a.id}` }));
-const betterRawEN = parsedEN.data.map(a => ({ ...a, id: `en_${a.id}` }));
-const RAW_COMBINED = [...betterRawPL, ...betterRawEN];
+async function loadJsonSafe<T>(path: string): Promise<T | null> {
+    try {
+        const mod = await import(`../data/${path}.json`);
+        return mod.default as T;
+    } catch (e) {
+        console.warn(`${e}`);
+        language[path as keyof typeof language] = false;
+        return null;
+    }
+}
+
+const safeParseActivities = (raw: unknown): Activity[] => {
+    if (!raw) return [];
+    const parsed = ActivityArraySchema.safeParse(raw);
+    return parsed.success ? parsed.data : [];
+}
+
+const RAW_PL = await loadJsonSafe("pl");
+const RAW_EN = await loadJsonSafe("en");
+const plData = safeParseActivities(RAW_PL).map(a => ({ ...a, id: `pl_${a.id}` }));
+const enData = safeParseActivities(RAW_EN).map(a => ({ ...a, id: `en_${a.id}` }));
+const RAW_COMBINED = [...plData, ...enData];
 const ROOTS = buildRoots(RAW_COMBINED as Activity[]);
 
 initStemmer(ROOTS);
